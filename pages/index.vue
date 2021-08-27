@@ -15,7 +15,11 @@
           ></v-slider>
           <v-row justify="center" align="center">
             <v-col cols="12" sm="4" md="4">
-              <v-text-field v-model="slider.val" outlined></v-text-field>
+              <v-text-field
+                v-model="slider.val"
+                outlined
+                :hide-details="true"
+              ></v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
@@ -30,6 +34,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn color="primary" nuxt @click="getMarketCaps"> Continue </v-btn>
+          <v-spacer />
         </v-card-actions>
 
         <v-container>
@@ -162,6 +167,7 @@ export default {
       )
     },
     getIronPrice() {
+      this.ironPrice = web3.utils.toBN('0')
       sushiUSDCIRONContact.methods
         .getReserves()
         .call({}, this.slider.val)
@@ -179,6 +185,7 @@ export default {
         )
     },
     getTitanPrice() {
+      this.titanPrice = web3.utils.toBN('0')
       sushiUSDCTITANContact.methods
         .getReserves()
         .call({}, this.slider.val)
@@ -189,9 +196,16 @@ export default {
 
             const micro = web3.utils.toBN(web3.utils.unitMap.micro)
             const mwei = web3.utils.toBN(web3.utils.unitMap.mwei)
-            this.titanPrice = web3.utils.toBN(
-              ((res0 / res1) * micro * mwei).toString().split('.')[0]
-            )
+            const kwei = web3.utils.toBN(web3.utils.unitMap.kwei)
+            if (res0.eq(web3.utils.toBN('1'))) {
+              this.titanPrice = web3.utils.toBN(
+                ((res0 / res1) * micro * kwei).toString().split('.')[0]
+              )
+            } else {
+              this.titanPrice = web3.utils.toBN(
+                ((res0 / res1) * micro * mwei).toString().split('.')[0]
+              )
+            }
             console.log(this.titanPrice.toString())
           }.bind(this)
         )
